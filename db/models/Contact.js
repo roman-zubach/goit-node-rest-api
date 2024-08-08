@@ -1,6 +1,7 @@
 import {DataTypes} from 'sequelize';
 
 import sequelize from '../sequelize.js';
+import User from './User.js';
 
 const Contact = sequelize.define(
     'contact', {
@@ -21,5 +22,13 @@ const Contact = sequelize.define(
             defaultValue: false,
         },
     });
+
+Contact.belongsTo(User, {
+    foreignKey: {
+        name: 'owner',
+        allowNull: false,
+    },
+    onDelete: 'CASCADE',
+});
 
 export default Contact;

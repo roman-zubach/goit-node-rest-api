@@ -1,29 +1,37 @@
 import Contact from '../db/models/Contact.js';
+import HttpError from '../helpers/HttpError.js';
 
-export async function listContacts() {
-    return Contact.findAll();
-}
+export const listContacts = async (query, { page, limit }) => {
+    const normalizedLimit = Number(limit);
+    const offset = (Number(page) - 1) * normalizedLimit;
 
-export async function getContactById(contactId) {
-    return Contact.findByPk(contactId);
-}
+    return Contact.findAll({ where: query, limit, offset });
+};
 
-export async function removeContact(contactId) {
-    const contact = await getContactById(contactId);
+export const getContactById = async (owner, contactId) => {
+    const contact = await Contact.findByPk(contactId);
+
+    if (contact && contact.owner !== owner.id) {
+        throw HttpError(403, 'Access denied');
+    }
+
+    return contact;
+};
+
+export const removeContact = async (owner, contactId) => {
+    const contact = await getContactById(owner, contactId);
 
     if (contact) await contact.destroy();
 
     return contact;
-}
+};
 
-export async function addContact(data) {
-    return Contact.create(data);
-}
+export const addContact = async (owner, data) => Contact.create({...data, owner });
 
-export async function updateContact(contactId, data) {
-    const contact = await getContactById(contactId);
+export const updateContact = async (owner, contactId, data) => {
+    const contact = await getContactById(owner, contactId);
 
     if (contact) await contact.update(data);
 
     return contact;
-}
+};

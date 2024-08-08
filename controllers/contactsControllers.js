@@ -1,17 +1,27 @@
-import * as contactsService from "../services/contactsServices.js";
-import HttpError from "../helpers/HttpError.js";
-import { cntrWraper } from "../helpers/cntrWraper.js";
+import * as contactsService from '../services/contactsServices.js';
+import HttpError from '../helpers/HttpError.js';
+import { cntrWraper } from '../helpers/cntrWraper.js';
 
 const getAllContacts = async (req, res) => {
-    const contacts = await contactsService.listContacts();
+    const { user } = req;
+    const { page = 1, limit = 10, favorite } = req.query;
+
+    let query = { owner : user.id };
+
+    if (favorite !== undefined) {
+        query = {...query, favorite};
+    }
+
+    const contacts = await contactsService.listContacts(query, { page, limit });
 
     res.json(contacts);
 };
 
 const getOneContact = async (req, res) => {
     const { id } = req.params;
+    const { user } = req;
 
-    const contact = await contactsService.getContactById(id);
+    const contact = await contactsService.getContactById(user, id);
 
     if (!contact) {
         throw HttpError(404);
@@ -22,8 +32,9 @@ const getOneContact = async (req, res) => {
 
 const deleteContact = async (req, res) => {
     const { id } = req.params;
+    const { user } = req;
 
-    const contact = await contactsService.removeContact(id);
+    const contact = await contactsService.removeContact(user, id);
 
     if (!contact) {
         throw HttpError(404);
@@ -34,18 +45,20 @@ const deleteContact = async (req, res) => {
 
 const createContact = async (req, res) => {
     const data = req.body;
+    const { user } = req;
 
-    const contact = await contactsService.addContact(data);
+    const contact = await contactsService.addContact(user, data);
 
     res.status(201).json(contact);
 };
 
 const updateContact = async (req, res) => {
     const { id } = req.params;
+    const { user } = req;
 
     const data = req.body;
 
-    const contact = await contactsService.updateContact(id, data);
+    const contact = await contactsService.updateContact(user, id, data);
 
     if (!contact) {
         throw HttpError(404);
@@ -56,10 +69,11 @@ const updateContact = async (req, res) => {
 
 const updateStatusContact = async (req, res) => {
     const { id } = req.params;
+    const { user } = req;
 
     const data = req.body;
 
-    const contact = await contactsService.updateContact(id, data);
+    const contact = await contactsService.updateContact(user, id, data);
 
     if (!contact) {
         throw HttpError(404);

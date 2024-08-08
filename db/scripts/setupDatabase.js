@@ -1,5 +1,6 @@
 import sequelize from '../sequelize.js';
 import seedContacts from './contacts/seedContacts.js';
+import seedUsers from "./users/seedUsers.js";
 
 const setupDatabase = async () => {
     try {
@@ -7,6 +8,7 @@ const setupDatabase = async () => {
         console.log('Database connection successful');
 
         await sequelize.sync({ force: true });
+        await seedUsers();
         await seedContacts();
 
         console.log('Database setup and seeding complete.');

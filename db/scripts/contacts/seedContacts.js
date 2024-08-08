@@ -7,7 +7,10 @@ const seedContacts = async () => {
 
     const contacts = JSON.parse(await fs.readFile(contactsPath, 'utf-8'));
 
-    const filteredData = contacts.map(({ id, ...rest }) => rest);
+    const filteredData = contacts.map(({ id, ...rest }) => ({
+        ...rest,
+        owner: Math.floor(Math.random() * 2) + 1,
+    }));
 
     await Contact.bulkCreate(filteredData);
 };

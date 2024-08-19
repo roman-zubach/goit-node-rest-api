@@ -2,7 +2,7 @@ import express from 'express';
 
 import contactsController from '../controllers/contactsControllers.js';
 import validateBody from '../helpers/validateBody.js';
-import authenticate from '../helpers/authenticate.js';
+import authenticate from '../middlware/authenticate.js';
 
 import {
     createContactSchema,

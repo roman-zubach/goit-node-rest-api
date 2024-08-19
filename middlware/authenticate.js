@@ -1,5 +1,5 @@
-import HttpError from './HttpError.js';
-import tokenManager from './tokenManager.js';
+import HttpError from '../helpers/HttpError.js';
+import tokenManager from '../helpers/tokenManager.js';
 import { getUser } from '../services/userServices.js';
 
 const authorizationHeaderName = 'Authorization';

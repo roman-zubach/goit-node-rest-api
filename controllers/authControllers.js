@@ -3,6 +3,7 @@ import { UniqueConstraintError } from 'sequelize';
 import { cntrWraper } from '../helpers/cntrWraper.js';
 import * as userServices from '../services/userServices.js';
 import HttpError from '../helpers/HttpError.js';
+import fileManager from "../helpers/fileManager.js";
 
 const sighUp = async (req, res) => {
     try {
@@ -35,9 +36,9 @@ const logout = async (req, res) => {
 };
 
 const myProfile = async (req, res) => {
-    const { user: { email, subscription } } = req;
+    const { user: { email, subscription, avatarURL } } = req;
 
-    res.json({ user: { email, subscription }});
+    res.json({ user: { email, subscription, avatarURL }});
 };
 
 const changeSubscription = async (req, res) => {
@@ -50,10 +51,26 @@ const changeSubscription = async (req, res) => {
     res.json({ user: { email, subscription }});
 };
 
+const updateAvatar = async (req, res) => {
+    const { user, file, protocol } = req;
+    const host = req.get('host');
+
+    if (!file) throw HttpError(400, 'Avatar is required');
+
+    const filePath = await fileManager.save(file, 'avatars');
+
+    const avatarURL = `${protocol}://${host}/${filePath}`;
+
+    await userServices.updateUser(user, { avatarURL });
+
+    res.json({ avatarURL });
+};
+
 export default {
     sighUp: cntrWraper(sighUp),
     sighIn: cntrWraper(sighIn),
     logout: cntrWraper(logout),
     myProfile: cntrWraper(myProfile),
     changeSubscription: cntrWraper(changeSubscription),
+    updateAvatar: cntrWraper(updateAvatar),
 };

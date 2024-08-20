@@ -13,7 +13,7 @@ const save = async (file, dir) => {
     try {
         await fs.rename(oldPath, newPath);
     } catch (error) {
-        throw new HttpError(500, 'Failed to save file');
+        throw HttpError(500, 'Failed to save file');
     }
 
     return `${dir}/${fullFileName}`

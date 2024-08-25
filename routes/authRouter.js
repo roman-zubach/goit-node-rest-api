@@ -4,7 +4,7 @@ import authenticate from '../middlware/authenticate.js';
 import upload from "../middlware/upload.js";
 
 import authControllers from '../controllers/authControllers.js';
-import { sighUpSchema, updateSubscriptionSchema } from '../schemas/authSchemas.js';
+import {resendVerificationEmailSchema, sighUpSchema, updateSubscriptionSchema} from '../schemas/authSchemas.js';
 
 const authRouter = express.Router();
 
@@ -19,5 +19,9 @@ authRouter.get('/current', authenticate, authControllers.myProfile);
 authRouter.patch('/subscription', authenticate, validateBody(updateSubscriptionSchema), authControllers.changeSubscription);
 
 authRouter.patch('/avatars', authenticate, upload.single('avatar'), authControllers.updateAvatar);
+
+authRouter.get('/verify/:verificationToken', authControllers.verifyEmail);
+
+authRouter.post('/verify', validateBody(resendVerificationEmailSchema), authControllers.resendVerificationEmail);
 
 export default authRouter;

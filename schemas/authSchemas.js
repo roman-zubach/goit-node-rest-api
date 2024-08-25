@@ -20,3 +20,11 @@ export const updateSubscriptionSchema = Joi.object({
         'string.empty': 'Subscription is required',
     }),
 });
+
+export const resendVerificationEmailSchema = Joi.object({
+    email: Joi.string().pattern(emailRegex).required().messages({
+        'string.pattern.base': 'Invalid email format.',
+        'string.empty': 'Email is required.',
+        'any.required': 'Email is required.',
+    }),
+})

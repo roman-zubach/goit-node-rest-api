@@ -66,6 +66,39 @@ const updateAvatar = async (req, res) => {
     res.json({ avatarURL });
 };
 
+const verifyEmail = async (req, res) => {
+    const { verificationToken } = req.params;
+
+    const user = await userServices.findUser({verificationToken});
+
+    if (!user) throw HttpError(404, 'User not found');
+
+    await userServices.updateUser(user, {
+        verificationToken: null,
+        verify: true,
+    });
+
+    res.json({
+        message: 'Verification successful',
+    });
+}
+
+const resendVerificationEmail = async (req, res) => {
+    const { email } = req.body;
+
+    const user = await userServices.findUser({email});
+
+    if (!user) throw HttpError(404, 'User not found');
+
+    if (user.verify) throw HttpError(400, 'Verification has already been passed');
+
+    userServices.sendVerifyEmail(user);
+
+    res.json({
+        message: 'Verification email sent',
+    });
+};
+
 export default {
     sighUp: cntrWraper(sighUp),
     sighIn: cntrWraper(sighIn),
@@ -73,4 +106,6 @@ export default {
     myProfile: cntrWraper(myProfile),
     changeSubscription: cntrWraper(changeSubscription),
     updateAvatar: cntrWraper(updateAvatar),
+    verifyEmail: cntrWraper(verifyEmail),
+    resendVerificationEmail: cntrWraper(resendVerificationEmail),
 };
